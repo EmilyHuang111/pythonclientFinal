@@ -28,7 +28,7 @@ def move_forward(currentState):
   currentState.config(text= "Current State: Forward")
   log_activity("Forward button clicked.")
   try:
-    url_fwd = requests.get("http://192.168.1.17:4444/forward/", timeout=1) 
+    url_fwd = requests.get("http://192.168.1.17:4444/forward", timeout=1) 
   except requests.exceptions.RequestException:
     currentState.config(text= "Current State: No Connection")
   else:
@@ -39,7 +39,7 @@ def move_backward(currentState):
   currentState.config(text= "Current State: Backward")
   log_activity("Backward button clicked.")
   try:
-    url_bwd = requests.get("http://192.168.1.17:4444/backward/", timeout=1) 
+    url_bwd = requests.get("http://192.168.1.17:4444/backward", timeout=1) 
   except requests.exceptions.RequestException:
     currentState.config(text= "Current State: No Connection")
   else:
@@ -50,7 +50,7 @@ def move_left(currentState):
   currentState.config(text= "Current State: Left")
   log_activity("Move left button clicked.")
   try:
-    url_left = requests.get("http://192.168.1.17:4444/left/", timeout=1) 
+    url_left = requests.get("http://192.168.1.17:4444/left", timeout=1) 
   except requests.exceptions.RequestException:
     currentState.config(text= "Current State: No Connection")
   else:
@@ -61,7 +61,7 @@ def move_right(currentState):
   currentState.config(text= "Current State: Right")
   log_activity("Move right button clicked.")
   try:
-    url_right = requests.get("http://192.168.1.17:4444/right/", timeout=1) 
+    url_right = requests.get("http://192.168.1.17:4444/right", timeout=1) 
   except requests.exceptions.RequestException:
     currentState.config(text= "Current State: No Connection")
   else:
@@ -72,7 +72,7 @@ def move_stop(currentState):
   currentState.config(text= "Current State: Stop")
   log_activity("Stop button clicked.")
   try:
-    url_stop = requests.get("http://192.168.1.17:4444/stop/", timeout=1) 
+    url_stop = requests.get("http://192.168.1.17:4444/stop", timeout=1) 
   except requests.exceptions.RequestException:
     currentState.config(text= "Current State: No Connection")
   else:
