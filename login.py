@@ -39,7 +39,7 @@ def login_menu():
 
 #Function to login user with the user inputs of username and password
 def login():
-  global welcome_window,login_window,first_name,login_warning,last_name
+  global welcome_window,login_window,first_name,login_warning,last_name,username
   assert loginUsernameEntry is not None
   enteredUsername = loginUsernameEntry.get()
   assert loginPasswordEntry is not None
@@ -54,7 +54,7 @@ def login():
   result = cursor.fetchone()
   connection.close()
   if result:
-    storedFirstName, storedLastName,storedPasswordHash, storedSalt = result
+    storedFirstName, storedLastName, storedPasswordHash, storedSalt = result
     enteredPasswordBytes = enteredPassword.encode('utf-8')
     enteredPasswordHash = hashlib.pbkdf2_hmac('sha256', enteredPasswordBytes,
                                               storedSalt, 100000)
@@ -65,13 +65,13 @@ def login():
       last_name = storedLastName
       loggedin_window = tk.Toplevel()
       loggedin_window.title("Logged In")
-      loggedin_window.geometry("800x40")
-      loggedin_label = tk.Label(loggedin_window,text=f"Welcome, {first_name}!")
+      loggedin_window.geometry("450x40")
+      loggedin_label = tk.Label(loggedin_window,text=f"Welcome, {enteredUsername}!")
       loggedin_label.pack(padx=20, pady=10)
-      activity = f"----- {first_name} {last_name} has logged in.-----"
+      activity = f"{enteredUsername} has logged in."
       log_activity(activity)
       #Show graphic user interface
-      GUI(first_name,last_name,loggedin_window)
+      GUI(first_name,last_name,enteredUsername,loggedin_window)
       #Close out root and login windows
       assert login_window is not None
       login_window.destroy()
