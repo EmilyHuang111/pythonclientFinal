@@ -7,7 +7,6 @@ from tkinter import scrolledtext
 from datetime import datetime
 import pytz
 
-
 # Set up logging with US/Eastern timezone
 eastern = pytz.timezone('US/Eastern')
 
@@ -26,6 +25,7 @@ logging.basicConfig(
     format='%(message)s',
 )
 
+
 # Function for the log information including date and time and message
 def log_activity(message):
   current_time = datetime.now(eastern).strftime('%Y-%m-%d %I:%M:%S %p')
@@ -35,7 +35,7 @@ def log_activity(message):
 # Function to move the robot forward through Flask App
 def move_forward(currentState, userName):
   currentState.config(text="Current State: Forward")
-  log_activity(f"{userName} has clicked Forward button.")
+  log_activity(f"{userName} clicked Forward button.")
   try:
     url_fwd = requests.get("http://192.168.1.17:4444/forward", timeout=10)
   except requests.exceptions.RequestException:
@@ -47,7 +47,7 @@ def move_forward(currentState, userName):
 # Function to move the robot backward through Flask App
 def move_backward(currentState, userName):
   currentState.config(text="Current State: Backward")
-  log_activity(f"{userName} has clicked Backward button.")
+  log_activity(f"{userName} clicked Backward button.")
   try:
     url_bwd = requests.get("http://192.168.1.17:4444/backward", timeout=10)
   except requests.exceptions.RequestException:
@@ -59,7 +59,7 @@ def move_backward(currentState, userName):
 # Function to move the robot left through Flask App
 def move_left(currentState, userName):
   currentState.config(text="Current State: Left")
-  log_activity(f"{userName} has clicked Left Move button.")
+  log_activity(f"{userName} clicked Left Move button.")
   try:
     url_left = requests.get("http://192.168.1.17:4444/left", timeout=10)
   except requests.exceptions.RequestException:
@@ -71,7 +71,7 @@ def move_left(currentState, userName):
 # Function to move the robot right through Flask App
 def move_right(currentState, userName):
   currentState.config(text="Current State: Right")
-  log_activity(f"{userName} has clicked Right Move button.")
+  log_activity(f"{userName} clicked Right Move button.")
   try:
     url_right = requests.get("http://192.168.1.17:4444/right", timeout=10)
   except requests.exceptions.RequestException:
@@ -83,7 +83,7 @@ def move_right(currentState, userName):
 # Function to start the robot through Flask App
 def move_start(currentState, userName):
   currentState.config(text="Current State: Start")
-  log_activity(f"{userName} has clicked Start button.")
+  log_activity(f"{userName} clicked Start button.")
   try:
     url_start = requests.get("http://192.168.1.17:4444/start", timeout=1)
   except requests.exceptions.RequestException:
@@ -95,7 +95,7 @@ def move_start(currentState, userName):
 # Function to stop the robot through Flask App
 def move_stop(currentState, userName):
   currentState.config(text="Current State: Stop")
-  log_activity(f"{userName} has clicked Stop button.")
+  log_activity(f"{userName} clicked Stop button.")
   try:
     url_stop = requests.get("http://192.168.1.17:4444/stop", timeout=10)
   except requests.exceptions.RequestException:
@@ -103,35 +103,28 @@ def move_stop(currentState, userName):
   else:
     return url_stop.json()
 
-# Function to show log file. Only show the log file for the rows with the username included. One user will not see other user's log information and the same user can see all the log information on record including login and logout.
-def show_log_file(userName):
+
+# Function to show log file directly in a text region. Only show the rows with the username included. One user will not see other user's log information and the same user can see all the log information on record including login and logout.
+
+
+def show_log_content(text_widget, userName):
   try:
-    # Replace 'your_log_file.txt' with the actual name of your log file
     log_file_path = 'activity_log.txt'
-
     with open(log_file_path, 'r') as file:
-        lines = file.readlines()
-
-    # Create a new top-level window for displaying the log content
-    log_window = tk.Toplevel()
-    log_window.title("Log File Content")
-
-    # Create a scrolled text widget with a scroll bar
-    log_text = scrolledtext.ScrolledText(log_window,
-                                         wrap=tk.WORD,
-                                         width=80,
-                                         height=20)
-    log_text.pack(expand=True, fill='both')
+      lines = file.readlines()
 
     # Display only the lines containing the userName
-    for line in lines:
-        if userName in line:
-            log_text.insert(tk.END, line)
+    log_content = "\n".join(line for line in lines if userName in line)
+    text_widget.delete(1.0, tk.END)
+    text_widget.insert(tk.END, log_content)
 
+    # Scroll to the top to show the latest log information
+    text_widget.yview(tk.END)
   except Exception as e:
     # Handle file not found or other exceptions
     print()
     messagebox.showerror("Error", f"Error opening log file: {e}")
+
 
 #Function to log out user.  The logout will send a message to the log file and go back to the root window for login and registration
 def exit_logout(firstName, lastName, userName, gui_window,
@@ -142,13 +135,14 @@ def exit_logout(firstName, lastName, userName, gui_window,
   loggedin_window.destroy()
   root.deiconify()
 
+
 # Function for the GUI including the definations for all the GUI elements and related python client functions. Python client will send a Request GET signal to the FLASK app for robot car movement.
 def GUI(firstName, lastName, user_name,
         loggedin_win):  #Function to create GUI after user logged in
   global state_label, user_window
   user_window = tk.Toplevel()
   user_window.title("GUI")
-  user_window.geometry("450x300")
+  user_window.geometry("600x400")
 
   # Create four grid cells as Frame widgets without background colors
   frame1 = tk.Frame(user_window,
@@ -232,10 +226,27 @@ def GUI(firstName, lastName, user_name,
   log_Label = ttk.Label(log_frame,
                         text="Log feed information                 ")
   log_Label.grid(row=0, column=0, columnspan=2)
-  show_log_button = ttk.Button(log_frame,
-                               text="Show Log File",
-                               command= lambda:show_log_file(user_name))
-  show_log_button.grid(row=1, column=0, pady=10)
+  # Create a scrolled text widget for log display
+  log_text = scrolledtext.ScrolledText(log_frame,
+                                       wrap=tk.WORD,
+                                       width=50,
+                                       height=10,
+                                       font=('TkDefaultFont', 8))
+  log_text.grid(row=1, column=0, columnspan=2, pady=10)
+
+  # Function to update log content periodically
+  def update_log_content():
+    show_log_content(log_text, user_name)
+    log_text.after(
+        1000, update_log_content
+    )  # Schedule the next update after 1000 milliseconds (1 second)
+
+  # Update the log content when the GUI is created
+  show_log_content(log_text, user_name)
+
+  # Start the periodic update
+  update_log_content()
+
   # Video feed frame
   video_frame = tk.Frame(frame3)
   video_frame.grid(row=0, column=1, rowspan=2, columnspan=2)
