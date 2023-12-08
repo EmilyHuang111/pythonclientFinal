@@ -28,7 +28,7 @@ logging.basicConfig(
 
 # Function for the log information including date and time and message
 def log_activity(message):
-  current_time = datetime.now(eastern).strftime('%Y-%m-%d %H:%M:%S')
+  current_time = datetime.now(eastern).strftime('%Y-%m-%d %I:%M:%S %p')
   logging.info(f"{current_time} - {message}")
 
 
