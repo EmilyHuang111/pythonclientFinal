@@ -4,6 +4,12 @@ from tkinter import ttk  #Imported for updating GUI style
 import logging
 from tkinter import messagebox
 from tkinter import scrolledtext
+from datetime import datetime
+import pytz
+
+
+# Set up logging with US/Eastern timezone
+eastern = pytz.timezone('US/Eastern')
 
 # Root Menu for user registration and login
 root = tk.Tk()
@@ -17,13 +23,13 @@ style.theme_use("clam")
 logging.basicConfig(
     filename='activity_log.txt',
     level=logging.INFO,
-    format='%(asctime)s - %(message)s',
-    datefmt='%Y-%m-%d %H:%M:%S',
+    format='%(message)s',
 )
 
-
+# Function for the log information including date and time and message
 def log_activity(message):
-  logging.info(message)
+  current_time = datetime.now(eastern).strftime('%Y-%m-%d %H:%M:%S')
+  logging.info(f"{current_time} - {message}")
 
 
 # Function to move the robot forward through Flask App
@@ -97,14 +103,14 @@ def move_stop(currentState, userName):
   else:
     return url_stop.json()
 
-
-def show_log_file():
+# Function to show log file. Only show the log file for the rows with the username included. One user will not see other user's log information and the same user can see all the log information on record including login and logout.
+def show_log_file(userName):
   try:
     # Replace 'your_log_file.txt' with the actual name of your log file
     log_file_path = 'activity_log.txt'
 
     with open(log_file_path, 'r') as file:
-      content = file.read()
+        lines = file.readlines()
 
     # Create a new top-level window for displaying the log content
     log_window = tk.Toplevel()
@@ -117,15 +123,17 @@ def show_log_file():
                                          height=20)
     log_text.pack(expand=True, fill='both')
 
-    # Insert the log content into the scrolled text widget
-    log_text.insert(tk.END, content)
+    # Display only the lines containing the userName
+    for line in lines:
+        if userName in line:
+            log_text.insert(tk.END, line)
 
   except Exception as e:
     # Handle file not found or other exceptions
     print()
     messagebox.showerror("Error", f"Error opening log file: {e}")
 
-
+#Function to log out user.  The logout will send a message to the log file and go back to the root window for login and registration
 def exit_logout(firstName, lastName, userName, gui_window,
                 loggedin_window):  #Function to exit the program
   activity = f"{userName} has logged out."
@@ -134,7 +142,7 @@ def exit_logout(firstName, lastName, userName, gui_window,
   loggedin_window.destroy()
   root.deiconify()
 
-
+# Function for the GUI including the definations for all the GUI elements and related python client functions. Python client will send a Request GET signal to the FLASK app for robot car movement.
 def GUI(firstName, lastName, user_name,
         loggedin_win):  #Function to create GUI after user logged in
   global state_label, user_window
@@ -218,7 +226,7 @@ def GUI(firstName, lastName, user_name,
   current_state = ttk.Label(direction_frame,
                             text="Current State: No action now")
   current_state.grid(row=4, column=0, columnspan=5)
-
+  # Log frame showing a button to disply the log file
   log_frame = tk.Frame(frame2)
   log_frame.grid(row=0, column=0, rowspan=2, columnspan=2)
   log_Label = ttk.Label(log_frame,
@@ -226,9 +234,9 @@ def GUI(firstName, lastName, user_name,
   log_Label.grid(row=0, column=0, columnspan=2)
   show_log_button = ttk.Button(log_frame,
                                text="Show Log File",
-                               command=show_log_file)
+                               command= lambda:show_log_file(user_name))
   show_log_button.grid(row=1, column=0, pady=10)
-
+  # Video feed frame
   video_frame = tk.Frame(frame3)
   video_frame.grid(row=0, column=1, rowspan=2, columnspan=2)
   video_Label = ttk.Label(video_frame, text="Video feed with image overlay")
@@ -237,7 +245,7 @@ def GUI(firstName, lastName, user_name,
   videoinput1_Label.grid(row=1, column=0, columnspan=2)
   videoinput2_Label = ttk.Label(video_frame, text="")
   videoinput2_Label.grid(row=2, column=0, columnspan=2)
-
+  # Blank frame left for future use
   blank_frame = tk.Frame(frame4)
   blank_frame.grid(row=0, column=1, rowspan=2, columnspan=2)
   blank_Label = ttk.Label(blank_frame,
