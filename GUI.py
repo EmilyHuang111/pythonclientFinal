@@ -85,7 +85,7 @@ def move_start(currentState, userName):
   currentState.config(text="Current State: Start")
   log_activity(f"{userName} clicked Start button.")
   try:
-    url_start = requests.get("http://192.168.1.17:4444/start", timeout=1)
+    url_start = requests.get("http://192.168.1.28:4444/start", timeout=1)
   except requests.exceptions.RequestException:
     currentState.config(text="Current State: No Connection")
   else:
@@ -97,7 +97,7 @@ def move_stop(currentState, userName):
   currentState.config(text="Current State: Stop")
   log_activity(f"{userName} clicked Stop button.")
   try:
-    url_stop = requests.get("http://192.168.1.17:4444/stop", timeout=10)
+    url_stop = requests.get("http://192.168.1.28:4444/stop", timeout=10)
   except requests.exceptions.RequestException:
     currentState.config(text="Current State: No Connection")
   else:
